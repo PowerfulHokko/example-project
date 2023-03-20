@@ -66,15 +66,12 @@ class StoreDB extends Actor with ActorLogging{
             val query: FixedSqlAction[Item, NoStream, Effect.Write] = insertQueryItem += dbItemToCreate
             sender() ! Connection.db.run(query)
         }
-        case  UpdateItem(item: exampleproject.model.dto.CreateItem) =>
-        case  DeleteItem(id: Int) =>
 
         case  GetAllStock => {
             val query = Tables.itemStockTable.result
             sender() ! Connection.db.run(query)
         }
 
-        case  GetItemStock(id: Long) =>
         case  CreateItemStock(itemStock: exampleproject.model.dto.CreateItemStock) =>
 
         case  UpdateItemStock(id: Long, amount: Long) => {
@@ -113,19 +110,10 @@ class StoreDB extends Actor with ActorLogging{
             }
         }
 
-        case  DeleteItemStock(id: Long) =>
-
-        case  GetAllItemCategory =>
-        case  GetItemCategory(id: Int) =>
-        case  CreateItemCategory(itemCategory: exampleproject.model.dto.CreateItemCategory) =>
-        case  UpdateItemCategory(itemCategory: exampleproject.model.dto.ItemCategory) =>
-        case  DeleteItemCategory(id: Int) =>
     }
 
     //database methods
     import slick.jdbc.PostgresProfile.api._
-
-
 
     object Tables{
         import slick.jdbc.PostgresProfile
