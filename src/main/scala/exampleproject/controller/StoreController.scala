@@ -21,6 +21,7 @@ object StoreController extends App with ItemJsonProtocol with ItemStockJsonProto
     implicit val exc: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(5))
     private val log = system.log
 
+    log.info(s"Started")
     /*
       ✓  GET /api/items
       ✓  GET /api/items/id   -> NOTE: Check implementation
@@ -55,6 +56,7 @@ object StoreController extends App with ItemJsonProtocol with ItemStockJsonProto
                     }
                     complete(entityFuture)
                 } ~ post {
+                    log.info(s"POST to ${req.getUri()}")
                     val entText: Future[String] = req.entity.toStrict(1 second).map(_.data.utf8String)
                     val text: String = Await.result[String](entText, 1 second)
                     val item: CreateItem = text.parseJson.convertTo[exampleproject.model.dto.CreateItem]
@@ -65,8 +67,9 @@ object StoreController extends App with ItemJsonProtocol with ItemStockJsonProto
                     })
                     complete(StatusCodes.Created, entity)
                 }
-            } ~ path(LongNumber){ id =>
+            } ~ (path(LongNumber) & extractRequest){ (id,req) =>
                 get{
+                    log.info(s"GET to ${req.getUri()} with id:$id")
                     val optionalItem: Future[Option[FullItem]] = StoreService.getItem(id)
                     val oItem = Await.result[Option[FullItem]](optionalItem, 1 second)
 
@@ -83,8 +86,9 @@ object StoreController extends App with ItemJsonProtocol with ItemStockJsonProto
             }
         } ~
         pathPrefix("api" / "items" / "stock"){
-            parameter('itemId.as[Long], 'qty.as[Long]){ (itemId, qty) =>
+            (parameter('itemId.as[Long], 'qty.as[Long]) & extractRequest){ (itemId, qty, req) =>
                 put{
+                    log.info(s"PUT to ${req.getUri()} with id:$itemId & qty:$qty")
                     val updatedStockWithItem : Future[Try[FullItem]] = StoreService.updateItemStock(itemId, qty)
                     val oItem = Await.result[Try[FullItem]](updatedStockWithItem, 1 second)
                     oItem match {
@@ -100,8 +104,9 @@ object StoreController extends App with ItemJsonProtocol with ItemStockJsonProto
                     }
                 }
             } ~
-            (pathEndOrSingleSlash) {
+                ((pathEndOrSingleSlash) & extractRequest) { req =>
                 get{
+                    log.info(s"PUT to ${req.getUri()}")
                     val totalStock: Future[Seq[exampleproject.model.dto.ItemStock]] = StoreService.getTotalStock
                     val entityFuture = totalStock.map{ itemStock: Seq[ItemStock] =>
                         HttpEntity(ContentTypes.`application/json`, itemStock.toJson.prettyPrint)
