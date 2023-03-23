@@ -8,7 +8,7 @@ val akkaVersion = "2.5.20"
 val akkaHttpVersion = "10.1.7"
 val scalaTestVersion = "3.0.5"
 
-libraryDependencies ++= Seq(
+val dependencies = Seq(
     // akka streams
     "com.typesafe.akka" %% "akka-stream" % akkaVersion,
     // akka http
@@ -30,3 +30,9 @@ libraryDependencies ++= Seq(
     "com.github.tminglei" %% "slick-pg_play-json" % "0.20.3"
 
 )
+
+lazy val root = project
+  .in(file("."))
+  .settings(
+      libraryDependencies ++= dependencies
+  )
