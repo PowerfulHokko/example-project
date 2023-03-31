@@ -1,0 +1,44 @@
+Postgresql
+    function:
+    description: update stock if and only if stock if still above or equal to zero after update.
+
+    CREATE OR REPLACE FUNCTION Func_Test (bigint, bigint)
+    RETURNS integer AS $stock$
+    DECLARE
+    --DECLARE NOTHING LOL; THIS AINT THE BORDER SECURITY
+    BEGIN
+    	--check if the item actually exists, then check if there's a stock entry, create or update it, return the new count or -1 if it's a bad request
+    	IF NOT EXISTS (SELECT * FROM examplestore.item WHERE id = $1)
+    		THEN
+    			RAISE NOTICE 'no item with id % found database', $1;
+    			RETURN -1;
+    		ELSE
+    			RAISE NOTICE 'item with id % found database', $1;
+    			IF NOT EXISTS (SELECT * FROM examplestore.item_stock WHERE item_id = $1)
+    				THEN
+    					RAISE NOTICE 'no item with id % found in stock table, creating entry', $1;
+    					IF ($2 > 0)
+    						THEN
+    							RAISE NOTICE 'created entry for id % with stocklevel %', $1, $2;
+    							INSERT INTO examplestore.item_stock (item_id, stock) VALUES ($1 ,$2);
+    							RETURN $2;
+    						ELSE
+    							RAISE NOTICE 'should not initialize a stock entry with negative value';
+    							RETURN -1;
+    					END IF;
+
+    				ELSE
+    					RAISE NOTICE 'item with id % found in stock table', $1;
+    					IF(((SELECT stock FROM examplestore.item_stock WHERE item_id = $1) + $2) >= 0)
+    							THEN
+    								RAISE NOTICE 'can update';
+    								UPDATE examplestore.item_stock SET stock = stock + $2 WHERE item_id = $1;
+    								RETURN (SELECT stock FROM examplestore.item_stock WHERE item_id = $1);
+    							ELSE
+    								RAISE NOTICE 'stock should not go below zero';
+    								return -1;
+    						END IF;
+    			END IF;
+    	END IF;
+    END;
+    $stock$ LANGUAGE plpgsql;
