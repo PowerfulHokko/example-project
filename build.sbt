@@ -18,7 +18,6 @@ val dependencies = Seq(
     // testing
     "com.typesafe.akka" %% "akka-testkit" % akkaVersion      % "test",
     "org.scalatest"     %% "scalatest"    % scalaTestVersion % "test",
-    "org.scalatestplus" %% "mockito-3-4"  % mockito          % "test",
 
     // JWT
     "com.pauldijou" %% "jwt-spray-json" % "2.1.0",
