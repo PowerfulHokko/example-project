@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:14.3-alpine3.16
+    container_name: pg
+    restart: always
+    ports:
+      - "54320:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./src/main/resources/exampleStore:/tmp/exampleStore
+      - ./src/main/resources/restore-pg.sh:/docker-entrypoint-initdb.d/restore-pg.sh
+  pgadmin:
+    image: dpage/pgadmin4:7.0
+    container_name: pgadmin4
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  pg-data:
+  pgadmin-data:
