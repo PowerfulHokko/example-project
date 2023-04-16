@@ -9,3 +9,8 @@ If questions... ask, and I shall answer (when I have the time, I might not be on
 
 Also if it's something that gets propper shape it could be a fun project for other beginning Scala developers too: project based learning is awesome!
 
+## How to run
+___
+1. Run `docker-compose up` from the root. This will setup a postgres database and PgAdmin on your local.
+2. Compile the project using SBT: `sbt compile`
+3. Run the project: `sbt run`. Alternatively, use IntelliJIdea to run the application.

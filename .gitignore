@@ -4,7 +4,9 @@
 /target/scala-2.12/classes/
 
 #IntelliJ
-.idea
+.idea/
+.idea/*
 
 #Bloop
-.bsp
+.bsp/
+.bsp/*
